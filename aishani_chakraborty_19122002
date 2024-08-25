@@ -1,0 +1,40 @@
+from flask import Flask, request, jsonify
+import string
+
+app = Flask(_name_)
+
+# Define a helper function to process the POST data
+def process_data(data):
+    user_id = f"{data['first_name'].lower()}{data['last_name'].lower()}{data['dob'].replace('-', '')}"
+    numbers = [int(x) for x in data.get('data', []) if x.isdigit()]
+    alphabets = [x for x in data.get('data', []) if x.isalpha()]
+    highest_lowercase = max([x for x in alphabets if x.islower()], default="")
+
+    response = {
+        "is_success": True,
+        "user_id": user_id,
+        "email_id": data.get('email_id', ''),
+        "roll_number": data.get('roll_number', ''),
+        "numbers": numbers,
+        "alphabets": alphabets,
+        "highest_lowercase": [highest_lowercase] if highest_lowercase else []
+    }
+    return response
+
+# Define the POST endpoint
+@app.route('/bfhl', methods=['POST'])
+def bfhl_post():
+    if request.is_json:
+        data = request.get_json()
+        response = process_data(data)
+        return jsonify(response), 200
+    else:
+        return jsonify({"is_success": False, "error": "Invalid input format"}), 400
+
+# Define the GET endpoint
+@app.route('/bfhl', methods=['GET'])
+def bfhl_get():
+    return jsonify({"operation_code": "OPERATION1234"}), 200
+
+if _name_ == '_main_':
+    app.run(debug=True)
